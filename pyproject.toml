@@ -117,10 +117,10 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/neurobm/neurobm"
+Homepage = "https://github.com/ai-in-pm/NeuroBM"
 Documentation = "https://neurobm.readthedocs.io"
-Repository = "https://github.com/neurobm/neurobm"
-"Bug Tracker" = "https://github.com/neurobm/neurobm/issues"
+Repository = "https://github.com/ai-in-pm/NeuroBM"
+"Bug Tracker" = "https://github.com/ai-in-pm/NeuroBM/issues"
 
 [project.scripts]
 neurobm = "neurobm.cli:main"

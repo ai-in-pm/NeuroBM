@@ -6,7 +6,7 @@ Copy and paste these commands one by one into your command prompt/terminal:
 
 ```bash
 # Navigate to project directory
-cd D:/Boltzmann_Machine
+cd D:/NeuroBM
 
 # Initialize git repository
 git init
