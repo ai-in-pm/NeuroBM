@@ -1,0 +1,265 @@
+# Research Monitoring Configuration for NeuroBM
+# This file configures the automated research monitoring system
+
+# Data sources for research monitoring
+sources:
+  arxiv:
+    enabled: true
+    categories:
+      - 'cs.LG'      # Machine Learning
+      - 'cs.AI'      # Artificial Intelligence
+      - 'cs.NE'      # Neural and Evolutionary Computing
+      - 'q-bio.NC'   # Neurons and Cognition
+      - 'stat.ML'    # Machine Learning (Statistics)
+    
+    query_terms:
+      - 'boltzmann machine'
+      - 'energy based model'
+      - 'cognitive modeling'
+      - 'computational neuroscience'
+      - 'restricted boltzmann machine'
+      - 'deep boltzmann machine'
+      - 'contrastive divergence'
+      - 'interpretable ai'
+      - 'explainable ai'
+      - 'synthetic data generation'
+    
+    max_results_per_query: 100
+    check_frequency: 'daily'
+  
+  conferences:
+    enabled: true
+    venues:
+      - name: 'NeurIPS'
+        url: 'https://neurips.cc'
+        check_proceedings: true
+      - name: 'ICML'
+        url: 'https://icml.cc'
+        check_proceedings: true
+      - name: 'ICLR'
+        url: 'https://iclr.cc'
+        check_proceedings: true
+      - name: 'AAAI'
+        url: 'https://aaai.org'
+        check_proceedings: true
+      - name: 'CogSci'
+        url: 'https://cognitivesciencesociety.org'
+        check_proceedings: true
+      - name: 'AISTATS'
+        url: 'https://aistats.org'
+        check_proceedings: true
+    
+    check_frequency: 'weekly'
+    look_ahead_months: 6
+  
+  institutions:
+    enabled: true
+    research_labs:
+      - name: 'DeepMind'
+        url: 'https://deepmind.com/research'
+        rss_feed: 'https://deepmind.com/research/publications/rss.xml'
+      - name: 'OpenAI'
+        url: 'https://openai.com/research'
+        check_blog: true
+      - name: 'Facebook AI Research'
+        url: 'https://ai.facebook.com/research'
+        check_publications: true
+      - name: 'Google AI'
+        url: 'https://ai.google/research'
+        check_publications: true
+      - name: 'Microsoft Research'
+        url: 'https://www.microsoft.com/en-us/research'
+        check_publications: true
+      - name: 'MIT CSAIL'
+        url: 'https://www.csail.mit.edu'
+        check_publications: true
+      - name: 'Stanford AI Lab'
+        url: 'https://ai.stanford.edu'
+        check_publications: true
+    
+    check_frequency: 'weekly'
+
+# Filtering and relevance scoring
+filtering:
+  min_relevance_score: 0.6
+  max_papers_per_week: 50
+  require_ethical_review: true
+  
+  # Relevance scoring weights
+  relevance_weights:
+    title_match: 0.4
+    abstract_match: 0.3
+    author_reputation: 0.1
+    venue_prestige: 0.1
+    citation_potential: 0.1
+  
+  # Keywords that boost relevance
+  high_relevance_keywords:
+    - 'boltzmann machine'
+    - 'energy based model'
+    - 'cognitive modeling'
+    - 'interpretable ai'
+    - 'responsible ai'
+  
+  # Keywords that trigger ethical review
+  ethical_review_keywords:
+    - 'clinical'
+    - 'medical'
+    - 'diagnosis'
+    - 'treatment'
+    - 'patient'
+    - 'healthcare'
+    - 'mental health'
+    - 'psychiatric'
+    - 'surveillance'
+    - 'monitoring'
+    - 'bias'
+    - 'discrimination'
+    - 'privacy'
+
+# Integration assessment
+integration:
+  auto_approve_threshold: 0.9
+  require_human_review: true
+  test_new_features: true
+  
+  # Integration categories
+  categories:
+    model_enhancement:
+      priority_weight: 0.8
+      effort_multiplier: 3.0
+      requires_breaking_change_review: true
+    
+    data_generation:
+      priority_weight: 0.6
+      effort_multiplier: 2.0
+      requires_quality_validation: true
+    
+    interpretability:
+      priority_weight: 0.7
+      effort_multiplier: 2.5
+      requires_visualization_update: true
+    
+    training_improvement:
+      priority_weight: 0.5
+      effort_multiplier: 1.5
+      requires_performance_benchmark: true
+    
+    documentation_update:
+      priority_weight: 0.3
+      effort_multiplier: 1.0
+      requires_review_only: true
+
+# Output and reporting
+output:
+  save_papers: true
+  save_directory: 'automation/data/papers'
+  
+  generate_weekly_digest: true
+  digest_directory: 'automation/reports/weekly_digests'
+  
+  create_integration_candidates: true
+  candidates_directory: 'automation/data/integration_candidates'
+  
+  # Digest format
+  digest_format:
+    include_abstracts: true
+    max_abstract_length: 200
+    include_relevance_scores: true
+    include_integration_potential: true
+    group_by_category: true
+
+# Notification settings
+notifications:
+  enabled: true
+  
+  weekly_digest:
+    enabled: true
+    recipients:
+      - 'research-team@neurobm.org'
+      - 'dev-team@neurobm.org'
+    
+    send_day: 'sunday'
+    send_time: '18:00'
+  
+  high_priority_papers:
+    enabled: true
+    threshold: 0.9
+    immediate_notification: true
+    recipients:
+      - 'lead-researcher@neurobm.org'
+
+# Rate limiting and API management
+api_limits:
+  arxiv:
+    requests_per_minute: 10
+    requests_per_hour: 100
+    retry_attempts: 3
+    retry_delay: 5
+  
+  general_web:
+    requests_per_minute: 30
+    requests_per_hour: 500
+    timeout_seconds: 30
+    user_agent: 'NeuroBM-Research-Monitor/1.0'
+
+# Caching and storage
+caching:
+  enabled: true
+  cache_directory: 'automation/data/cache'
+  cache_duration_days: 7
+  
+  # Cache different content types
+  paper_metadata_cache: true
+  author_info_cache: true
+  venue_info_cache: true
+
+# Quality assurance
+quality_assurance:
+  duplicate_detection: true
+  duplicate_threshold: 0.95
+  
+  content_validation: true
+  min_abstract_length: 50
+  max_abstract_length: 5000
+  
+  author_validation: true
+  min_authors: 1
+  max_authors: 20
+  
+  date_validation: true
+  max_future_days: 30
+  max_past_days: 365
+
+# Logging configuration
+logging:
+  level: 'INFO'
+  log_file: 'automation/logs/research_monitor.log'
+  
+  log_rotation:
+    enabled: true
+    max_size_mb: 10
+    backup_count: 5
+  
+  log_components:
+    - 'paper_discovery'
+    - 'relevance_scoring'
+    - 'integration_assessment'
+    - 'ethical_review'
+    - 'digest_generation'
+
+# Advanced features
+advanced:
+  use_ai_analysis: true
+  ai_model_config:
+    relevance_classifier: 'microsoft/DialoGPT-medium'
+    summarization_model: 'facebook/bart-large-cnn'
+    
+  semantic_analysis: true
+  citation_network_analysis: false  # Requires additional APIs
+  
+  trend_analysis: true
+  trend_window_weeks: 12
+  
+  collaboration_detection: true
+  track_author_networks: true

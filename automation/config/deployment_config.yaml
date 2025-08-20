@@ -1,0 +1,410 @@
+# Deployment Configuration for NeuroBM
+# This file configures the automated deployment pipeline
+
+# Release schedule configuration
+schedule:
+  release_day: 'tuesday'
+  release_time: '10:00'
+  timezone: 'UTC'
+  auto_deploy: true
+  
+  # Weekly schedule
+  weekly_schedule:
+    sunday:
+      - time: '20:00'
+        task: 'prepare_weekly_release'
+        description: 'Automated builds and testing'
+    
+    monday:
+      - time: '09:00'
+        task: 'review_weekly_release'
+        description: 'Review and approval process'
+    
+    tuesday:
+      - time: '10:00'
+        task: 'execute_weekly_release'
+        description: 'Release deployment'
+      
+      - time: '14:00'
+        task: 'post_release_validation'
+        description: 'Post-deployment validation'
+  
+  # Emergency release settings
+  emergency_release:
+    enabled: true
+    approval_required: true
+    min_approvers: 2
+    max_frequency_per_week: 2
+
+# Deployment stages configuration
+stages:
+  development:
+    branch: 'dev'
+    auto_deploy: true
+    environment: 'development'
+    
+    quality_gates:
+      - 'unit_tests'
+      - 'integration_tests'
+      - 'code_quality_check'
+    
+    deployment_strategy: 'direct'
+    rollback_enabled: true
+    
+    notifications:
+      on_success: false
+      on_failure: true
+  
+  staging:
+    branch: 'staging'
+    auto_deploy: true
+    environment: 'staging'
+    
+    quality_gates:
+      - 'unit_tests'
+      - 'integration_tests'
+      - 'performance_tests'
+      - 'security_scan'
+      - 'documentation_check'
+    
+    deployment_strategy: 'blue_green'
+    rollback_enabled: true
+    
+    notifications:
+      on_success: true
+      on_failure: true
+    
+    # Staging-specific settings
+    load_testing: true
+    user_acceptance_testing: false
+  
+  production:
+    branch: 'main'
+    auto_deploy: false  # Requires manual approval
+    environment: 'production'
+    
+    quality_gates:
+      - 'all_tests'
+      - 'security_scan'
+      - 'performance_benchmark'
+      - 'documentation_complete'
+      - 'ethical_review_complete'
+    
+    deployment_strategy: 'canary'
+    rollback_enabled: true
+    
+    notifications:
+      on_success: true
+      on_failure: true
+      on_start: true
+    
+    # Production-specific settings
+    approval_required: true
+    min_approvers: 2
+    deployment_window:
+      start_time: '09:00'
+      end_time: '17:00'
+      timezone: 'UTC'
+      exclude_weekends: true
+
+# Quality gates configuration
+quality_gates:
+  unit_tests:
+    command: 'python -m pytest tests/unit/ -v --cov=neurobm --cov-report=xml'
+    timeout: 300
+    required: true
+    success_criteria:
+      - 'exit_code_zero'
+      - 'coverage_threshold_80'
+    
+    retry_policy:
+      max_retries: 2
+      retry_delay: 30
+  
+  integration_tests:
+    command: 'python test_neurobm_comprehensive.py'
+    timeout: 600
+    required: true
+    success_criteria:
+      - 'exit_code_zero'
+      - 'all_tests_pass'
+    
+    retry_policy:
+      max_retries: 1
+      retry_delay: 60
+  
+  performance_tests:
+    command: 'python automation/performance_tests.py --benchmark'
+    timeout: 1200
+    required: true
+    success_criteria:
+      - 'exit_code_zero'
+      - 'performance_regression_under_10_percent'
+    
+    baseline_file: 'automation/data/performance_baseline.json'
+    
+    retry_policy:
+      max_retries: 1
+      retry_delay: 120
+  
+  security_scan:
+    command: 'python automation/security_scan.py'
+    timeout: 300
+    required: false  # Optional for now
+    success_criteria:
+      - 'no_high_severity_issues'
+      - 'no_medium_severity_issues'
+  
+  code_quality_check:
+    command: 'python automation/code_quality_check.py'
+    timeout: 180
+    required: true
+    success_criteria:
+      - 'linting_pass'
+      - 'type_checking_pass'
+      - 'complexity_under_threshold'
+  
+  documentation_check:
+    command: 'python automation/documentation_check.py'
+    timeout: 120
+    required: true
+    success_criteria:
+      - 'all_required_docs_present'
+      - 'no_broken_links'
+      - 'examples_work'
+
+# Deployment strategies
+deployment_strategies:
+  direct:
+    description: 'Direct deployment to target environment'
+    steps:
+      - 'checkout_target_branch'
+      - 'run_quality_gates'
+      - 'deploy_application'
+      - 'run_smoke_tests'
+  
+  blue_green:
+    description: 'Blue-green deployment with environment switching'
+    steps:
+      - 'prepare_green_environment'
+      - 'deploy_to_green'
+      - 'run_quality_gates_on_green'
+      - 'switch_traffic_to_green'
+      - 'monitor_green_environment'
+      - 'decommission_blue_environment'
+    
+    rollback_strategy: 'switch_back_to_blue'
+  
+  canary:
+    description: 'Canary deployment with gradual traffic shifting'
+    steps:
+      - 'deploy_canary_version'
+      - 'route_small_traffic_to_canary'
+      - 'monitor_canary_metrics'
+      - 'gradually_increase_canary_traffic'
+      - 'complete_canary_deployment'
+    
+    traffic_percentages: [5, 25, 50, 100]
+    monitoring_duration_minutes: 30
+    rollback_strategy: 'immediate_traffic_switch'
+
+# Notification configuration
+notifications:
+  email:
+    enabled: true
+    smtp_server: 'smtp.gmail.com'
+    smtp_port: 587
+    use_tls: true
+    
+    # Email lists
+    recipients:
+      dev_team: ['dev-team@neurobm.org']
+      qa_team: ['qa-team@neurobm.org']
+      management: ['management@neurobm.org']
+      all_team: ['all-team@neurobm.org']
+    
+    # Email templates
+    templates:
+      deployment_success: 'automation/templates/deployment_success_email.html'
+      deployment_failure: 'automation/templates/deployment_failure_email.html'
+      rollback_notification: 'automation/templates/rollback_notification_email.html'
+  
+  slack:
+    enabled: false  # Configure webhook URL to enable
+    webhook_url: ''
+    
+    channels:
+      general: '#general'
+      deployments: '#deployments'
+      alerts: '#alerts'
+    
+    message_format: 'markdown'
+  
+  github:
+    enabled: true
+    create_release: true
+    update_status_checks: true
+    
+    release_settings:
+      generate_release_notes: true
+      include_changelog: true
+      mark_as_prerelease: false
+
+# Rollback configuration
+rollback:
+  auto_rollback_on_failure: true
+  max_rollback_time_hours: 24
+  require_approval: true
+  
+  # Rollback triggers
+  triggers:
+    quality_gate_failure: true
+    performance_degradation: true
+    error_rate_increase: true
+    manual_trigger: true
+  
+  # Rollback strategies
+  strategies:
+    immediate:
+      description: 'Immediate rollback to previous version'
+      max_time_minutes: 5
+    
+    gradual:
+      description: 'Gradual rollback with traffic shifting'
+      max_time_minutes: 30
+  
+  # Post-rollback actions
+  post_rollback_actions:
+    - 'run_validation_tests'
+    - 'send_notifications'
+    - 'create_incident_report'
+    - 'schedule_post_mortem'
+
+# Monitoring and health checks
+monitoring:
+  health_checks:
+    enabled: true
+    
+    endpoints:
+      - path: '/health'
+        method: 'GET'
+        expected_status: 200
+        timeout: 10
+      
+      - path: '/api/status'
+        method: 'GET'
+        expected_status: 200
+        timeout: 5
+    
+    check_frequency: 60  # seconds
+    failure_threshold: 3  # consecutive failures
+  
+  performance_monitoring:
+    enabled: true
+    
+    metrics:
+      - 'response_time'
+      - 'error_rate'
+      - 'throughput'
+      - 'memory_usage'
+      - 'cpu_usage'
+    
+    thresholds:
+      response_time_ms: 1000
+      error_rate_percent: 5
+      memory_usage_percent: 80
+      cpu_usage_percent: 70
+  
+  alerting:
+    enabled: true
+    
+    alert_rules:
+      - name: 'high_error_rate'
+        condition: 'error_rate > 5%'
+        duration: '5m'
+        severity: 'critical'
+      
+      - name: 'slow_response_time'
+        condition: 'response_time > 1000ms'
+        duration: '10m'
+        severity: 'warning'
+
+# Security configuration
+security:
+  vulnerability_scanning: true
+  dependency_checking: true
+  secrets_scanning: true
+  
+  # Security policies
+  policies:
+    no_hardcoded_secrets: true
+    secure_dependencies_only: true
+    regular_security_updates: true
+  
+  # Compliance requirements
+  compliance:
+    data_protection: true
+    audit_logging: true
+    access_control: true
+
+# Backup and disaster recovery
+backup:
+  enabled: true
+  
+  backup_schedule:
+    frequency: 'daily'
+    time: '02:00'
+    retention_days: 30
+  
+  backup_targets:
+    - 'configuration_files'
+    - 'deployment_history'
+    - 'performance_baselines'
+    - 'documentation'
+  
+  disaster_recovery:
+    rto_minutes: 60  # Recovery Time Objective
+    rpo_minutes: 15  # Recovery Point Objective
+    
+    recovery_procedures:
+      - 'restore_from_backup'
+      - 'validate_system_integrity'
+      - 'run_smoke_tests'
+      - 'notify_stakeholders'
+
+# Logging and audit
+logging:
+  level: 'INFO'
+  log_file: 'automation/logs/deployment_manager.log'
+  
+  log_rotation:
+    enabled: true
+    max_size_mb: 50
+    backup_count: 10
+  
+  audit_logging:
+    enabled: true
+    audit_file: 'automation/logs/deployment_audit.log'
+    
+    audit_events:
+      - 'deployment_start'
+      - 'deployment_complete'
+      - 'deployment_failure'
+      - 'rollback_triggered'
+      - 'approval_granted'
+      - 'approval_denied'
+
+# Performance optimization
+performance:
+  parallel_deployments: false  # Deploy stages sequentially for safety
+  deployment_timeout_minutes: 60
+  
+  optimization:
+    cache_dependencies: true
+    parallel_testing: true
+    incremental_builds: true
+  
+  resource_limits:
+    max_memory_mb: 4096
+    max_cpu_percent: 80
+    max_disk_usage_percent: 70

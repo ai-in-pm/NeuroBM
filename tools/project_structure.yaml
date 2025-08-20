@@ -1,0 +1,112 @@
+# NeuroBM Project Structure Schema
+# This file defines the canonical directory structure and requirements
+# for the NeuroBM Boltzmann Machine research stack
+
+folders:
+  - "neurobm"
+  - "neurobm/models"
+  - "neurobm/training"
+  - "neurobm/interpret"
+  - "neurobm/data"
+  - "experiments"
+  - "experiments/ablations"
+  - "dashboards"
+  - "scripts"
+  - "notebooks"
+  - "tests"
+  - "configs"
+  - "configs/sweeps"
+  - "governance"
+  - "tools"
+  - "tools/templates"
+  - "runs"         # gitignored
+  - "archives"     # gitignored
+
+required_files:
+  - "pyproject.toml"
+  - "README.md"
+  - "LICENSE"
+  - "CONTRIBUTING.md"
+  - ".gitignore"
+  - ".gitattributes"
+  - ".pre-commit-config.yaml"
+  - "Makefile"
+  - "governance/ETHICS.md"
+  - "governance/MODEL_CARD.md"
+  - "governance/DATA_CARD_TEMPLATE.md"
+  - "governance/ASSUMPTIONS.yaml"
+  - "configs/logging.yaml"
+  - "neurobm/__init__.py"
+  - "neurobm/models/__init__.py"
+  - "neurobm/training/__init__.py"
+  - "neurobm/interpret/__init__.py"
+  - "neurobm/data/__init__.py"
+  - "scripts/neurobm_scaffold.py"
+
+stub_modules:
+  - path: "neurobm/models/rbm.py"
+    docstring: "Restricted Boltzmann Machine implementation with CD-k and PCD training"
+  - path: "neurobm/models/dbm.py"
+    docstring: "Deep Boltzmann Machine with layer-wise pretraining and mean-field inference"
+  - path: "neurobm/models/crbm.py"
+    docstring: "Conditional RBM for temporal sequence modeling"
+  - path: "neurobm/models/utils.py"
+    docstring: "Utility functions for energy computation and sampling"
+  - path: "neurobm/training/loop.py"
+    docstring: "Training loops for Boltzmann machines with callbacks and logging"
+  - path: "neurobm/training/ais.py"
+    docstring: "Annealed Importance Sampling for likelihood estimation"
+  - path: "neurobm/training/eval.py"
+    docstring: "Evaluation metrics and validation procedures"
+  - path: "neurobm/training/callbacks.py"
+    docstring: "Training callbacks for early stopping, checkpointing, and monitoring"
+  - path: "neurobm/interpret/saliency.py"
+    docstring: "Saliency analysis and weight visualization tools"
+  - path: "neurobm/interpret/mutual_info.py"
+    docstring: "Mutual information analysis between latent and visible units"
+  - path: "neurobm/interpret/traversals.py"
+    docstring: "Latent space traversal and interpolation tools"
+  - path: "neurobm/interpret/tiles.py"
+    docstring: "Filter tiling and receptive field visualization"
+  - path: "neurobm/data/schema.py"
+    docstring: "Data schemas for different cognitive/behavioral regimes"
+  - path: "neurobm/data/synth.py"
+    docstring: "Synthetic data generators for research scenarios"
+  - path: "neurobm/data/loaders.py"
+    docstring: "Data loading and preprocessing utilities"
+  - path: "neurobm/data/transforms.py"
+    docstring: "Data transformation and normalization functions"
+
+policies:
+  ensure_dunder_init: true
+  enforce_snake_case: true
+  license_header: "Apache-2.0"
+  python_version: ">=3.12"
+  
+experiment_configs:
+  - "experiments/base.yaml"
+  - "experiments/ptsd.yaml"
+  - "experiments/autism.yaml"
+  - "experiments/ai_reliance.yaml"
+  - "experiments/ablations/k_steps.yaml"
+  - "experiments/ablations/hidden_units.yaml"
+  - "experiments/ablations/temp_schedules.yaml"
+
+notebooks:
+  - "notebooks/01_theory_primer.ipynb"
+  - "notebooks/02_base_latents.ipynb"
+  - "notebooks/03_ptsd_hypotheses.ipynb"
+  - "notebooks/04_autism_hypotheses.ipynb"
+  - "notebooks/05_ai_reliance_scenarios.ipynb"
+  - "notebooks/06_brain_reserve.ipynb"
+
+scripts:
+  - "scripts/train.py"
+  - "scripts/sample.py"
+  - "scripts/eval_ais.py"
+  - "scripts/make_report.py"
+
+sweep_configs:
+  - "configs/sweeps/sweep_hidden_units.yaml"
+  - "configs/sweeps/sweep_k_steps.yaml"
+  - "configs/sweeps/sweep_temp.yaml"

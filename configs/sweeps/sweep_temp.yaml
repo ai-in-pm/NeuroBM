@@ -1,0 +1,11 @@
+base_config: experiments/base.yaml
+method: grid
+name: temperature_sweep
+parameters:
+  training.temperature:
+    values:
+    - 0.5
+    - 0.7
+    - 1.0
+    - 1.2
+    - 1.5

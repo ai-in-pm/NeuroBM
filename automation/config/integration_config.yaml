@@ -1,0 +1,367 @@
+# Integration Pipeline Configuration for NeuroBM
+# This file configures the automated integration pipeline
+
+# Integration assessment and approval
+integration:
+  auto_approve_threshold: 0.9
+  require_human_review: true
+  test_timeout_minutes: 30
+  backup_before_integration: true
+  
+  # Integration effort estimation
+  effort_estimation:
+    small:
+      max_files_changed: 3
+      max_lines_changed: 100
+      estimated_hours: 2
+    
+    medium:
+      max_files_changed: 10
+      max_lines_changed: 500
+      estimated_hours: 8
+    
+    large:
+      max_files_changed: 25
+      max_lines_changed: 2000
+      estimated_hours: 24
+  
+  # Priority levels
+  priority_levels:
+    high:
+      relevance_threshold: 0.9
+      impact_threshold: 0.8
+      auto_schedule: true
+      max_wait_days: 1
+    
+    medium:
+      relevance_threshold: 0.7
+      impact_threshold: 0.6
+      auto_schedule: false
+      max_wait_days: 7
+    
+    low:
+      relevance_threshold: 0.6
+      impact_threshold: 0.4
+      auto_schedule: false
+      max_wait_days: 30
+
+# Version management integration
+versioning:
+  major_version_triggers:
+    - 'breaking_change'
+    - 'new_architecture'
+    - 'api_redesign'
+    - 'major_model_change'
+  
+  minor_version_triggers:
+    - 'new_feature'
+    - 'model_enhancement'
+    - 'new_cognitive_regime'
+    - 'interpretability_improvement'
+  
+  patch_version_triggers:
+    - 'bug_fix'
+    - 'documentation_update'
+    - 'performance_improvement'
+    - 'minor_enhancement'
+  
+  # Semantic versioning rules
+  semantic_versioning:
+    enabled: true
+    auto_increment: true
+    require_changelog: true
+    require_migration_guide: true
+
+# Quality gates and validation
+quality_gates:
+  require_tests: true
+  require_documentation: true
+  require_ethical_review: true
+  min_test_coverage: 0.8
+  
+  # Specific quality checks
+  code_quality:
+    run_linting: true
+    run_type_checking: true
+    run_security_scan: false  # Optional
+    max_complexity: 10
+  
+  performance:
+    run_benchmarks: true
+    max_performance_regression: 0.1  # 10%
+    memory_limit_mb: 2048
+  
+  compatibility:
+    test_backward_compatibility: true
+    test_python_versions: ['3.8', '3.9', '3.10']
+    test_dependency_compatibility: true
+
+# Integration types and handling
+integration_types:
+  model_enhancement:
+    target_directories:
+      - 'neurobm/models/'
+      - 'neurobm/training/'
+    
+    required_files:
+      - 'model_card.md'
+      - 'performance_benchmark.py'
+      - 'unit_tests.py'
+    
+    validation_steps:
+      - 'model_convergence_test'
+      - 'performance_benchmark'
+      - 'backward_compatibility_test'
+    
+    documentation_updates:
+      - 'API documentation'
+      - 'model cards'
+      - 'architecture diagrams'
+  
+  data_generation:
+    target_directories:
+      - 'neurobm/data/'
+      - 'neurobm/data/generators/'
+    
+    required_files:
+      - 'data_card.md'
+      - 'quality_validation.py'
+      - 'generation_examples.py'
+    
+    validation_steps:
+      - 'data_quality_test'
+      - 'correlation_preservation_test'
+      - 'statistical_validation'
+    
+    documentation_updates:
+      - 'data cards'
+      - 'generation examples'
+      - 'quality metrics'
+  
+  interpretability:
+    target_directories:
+      - 'neurobm/interpret/'
+      - 'dashboards/'
+    
+    required_files:
+      - 'interpretation_guide.md'
+      - 'visualization_examples.py'
+      - 'accuracy_tests.py'
+    
+    validation_steps:
+      - 'interpretation_accuracy_test'
+      - 'visualization_quality_test'
+      - 'computational_efficiency_test'
+    
+    documentation_updates:
+      - 'interpretation guides'
+      - 'visualization examples'
+      - 'usage tutorials'
+  
+  training_improvement:
+    target_directories:
+      - 'neurobm/training/'
+      - 'neurobm/optimization/'
+    
+    required_files:
+      - 'training_guide.md'
+      - 'convergence_tests.py'
+      - 'performance_comparison.py'
+    
+    validation_steps:
+      - 'convergence_test'
+      - 'performance_comparison'
+      - 'stability_test'
+    
+    documentation_updates:
+      - 'training guides'
+      - 'optimization examples'
+      - 'performance comparisons'
+
+# Git workflow configuration
+git_workflow:
+  branches:
+    development: 'dev'
+    staging: 'staging'
+    production: 'main'
+    feature_prefix: 'feature/integration_'
+    release_prefix: 'release/'
+  
+  pull_request:
+    require_review: true
+    min_reviewers: 2
+    require_tests_pass: true
+    require_documentation: true
+    auto_merge_threshold: 0.95
+  
+  commit_conventions:
+    use_conventional_commits: true
+    types:
+      - 'feat'      # New feature
+      - 'fix'       # Bug fix
+      - 'docs'      # Documentation
+      - 'style'     # Code style
+      - 'refactor'  # Code refactoring
+      - 'test'      # Tests
+      - 'chore'     # Maintenance
+      - 'integration'  # Research integration
+
+# Testing configuration
+testing:
+  test_suites:
+    unit_tests:
+      command: 'python -m pytest tests/unit/'
+      timeout: 300
+      required: true
+      coverage_threshold: 0.8
+    
+    integration_tests:
+      command: 'python test_neurobm_comprehensive.py'
+      timeout: 600
+      required: true
+      coverage_threshold: 0.7
+    
+    performance_tests:
+      command: 'python automation/performance_tests.py'
+      timeout: 1200
+      required: false
+      regression_threshold: 0.1
+    
+    security_tests:
+      command: 'python automation/security_tests.py'
+      timeout: 300
+      required: false
+  
+  test_environments:
+    - python_version: '3.8'
+      os: 'ubuntu-latest'
+      required: true
+    
+    - python_version: '3.9'
+      os: 'ubuntu-latest'
+      required: true
+    
+    - python_version: '3.10'
+      os: 'windows-latest'
+      required: false
+
+# Code generation and templates
+code_generation:
+  enabled: true
+  
+  templates:
+    model_enhancement:
+      template_file: 'automation/templates/model_enhancement.py.j2'
+      output_pattern: 'neurobm/models/enhanced_{paper_id}.py'
+    
+    data_generator:
+      template_file: 'automation/templates/data_generator.py.j2'
+      output_pattern: 'neurobm/data/generators/{paper_id}_generator.py'
+    
+    interpretability_method:
+      template_file: 'automation/templates/interpretability.py.j2'
+      output_pattern: 'neurobm/interpret/{paper_id}_method.py'
+  
+  ai_assisted_generation:
+    enabled: false  # Requires AI API access
+    model: 'gpt-4'
+    max_tokens: 2000
+    temperature: 0.3
+
+# Documentation automation
+documentation:
+  auto_update: true
+  
+  update_targets:
+    - 'README.md'
+    - 'CHANGELOG.md'
+    - 'docs/API.md'
+    - 'docs/architecture.md'
+  
+  generation:
+    api_docs: true
+    model_cards: true
+    data_cards: true
+    migration_guides: true
+  
+  validation:
+    check_links: true
+    check_examples: true
+    check_completeness: true
+
+# Rollback and recovery
+rollback:
+  auto_rollback_on_failure: true
+  max_rollback_time_hours: 24
+  require_approval: true
+  
+  backup_strategy:
+    create_backup_branch: true
+    backup_prefix: 'backup_pre_integration_'
+    keep_backups: 10
+  
+  recovery_steps:
+    - 'restore_from_backup'
+    - 'run_validation_tests'
+    - 'update_documentation'
+    - 'notify_team'
+
+# Monitoring and alerting
+monitoring:
+  integration_metrics: true
+  performance_tracking: true
+  error_tracking: true
+  
+  alerts:
+    integration_failure:
+      enabled: true
+      recipients: ['dev-team@neurobm.org']
+      severity: 'high'
+    
+    performance_regression:
+      enabled: true
+      threshold: 0.2  # 20% regression
+      recipients: ['performance-team@neurobm.org']
+      severity: 'medium'
+    
+    test_failure:
+      enabled: true
+      recipients: ['qa-team@neurobm.org']
+      severity: 'medium'
+
+# Ethical review process
+ethical_review:
+  required_for_types:
+    - 'model_enhancement'
+    - 'data_generation'
+    - 'new_cognitive_regime'
+  
+  review_criteria:
+    - 'no_real_patient_data'
+    - 'educational_purpose_only'
+    - 'bias_assessment'
+    - 'privacy_preservation'
+    - 'transparency_requirements'
+  
+  reviewers:
+    - 'ethics-committee@neurobm.org'
+    - 'domain-experts@neurobm.org'
+  
+  approval_threshold: 2  # Minimum approvals required
+
+# Logging and audit
+logging:
+  level: 'INFO'
+  log_file: 'automation/logs/integration_pipeline.log'
+  
+  audit_trail:
+    enabled: true
+    track_all_changes: true
+    include_code_diffs: true
+    retention_days: 365
+  
+  metrics_collection:
+    integration_success_rate: true
+    average_integration_time: true
+    test_failure_rate: true
+    rollback_frequency: true

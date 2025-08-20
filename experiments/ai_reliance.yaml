@@ -1,0 +1,177 @@
+# AI Reliance Experiment Configuration
+# Modeling human-AI interaction patterns and reliance behaviors
+
+name: ai_reliance_modeling
+description: "AI reliance and human-automation interaction modeling using RBM"
+version: "1.0"
+
+# Model configuration
+model:
+  type: rbm
+  architecture:
+    n_visible: auto  # Determined by feature count (5 features)
+    n_hidden: 256   # Standard hidden layer size
+    visible_type: bernoulli
+    hidden_type: bernoulli
+  parameters:
+    learning_rate: 0.01
+    momentum: 0.9
+    weight_decay: 0.0003
+    temperature: 1.0
+    use_bias: true
+    sparsity_target: 0.12  # Moderate sparsity for interaction patterns
+    sparsity_weight: 0.001
+
+# Training configuration
+training:
+  algorithm: cd
+  k_steps: 5      # More steps for interaction dynamics
+  persistent: false
+  batch_size: 64
+  epochs: 100
+  validation_split: 0.2
+
+  # Optimization
+  optimizer:
+    type: adam
+    learning_rate: 0.01
+    beta1: 0.9
+    beta2: 0.999
+    weight_decay: 0.0003
+
+  # Learning rate scheduling
+  lr_scheduler:
+    type: exponential
+    gamma: 0.98
+
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 15
+    monitor: val_reconstruction_error
+    min_delta: 0.001
+    restore_best_weights: true
+
+# Data configuration
+data:
+  regime: ai_reliance
+  generation:
+    method: skewed
+    n_samples: 10000
+    random_seed: 42
+    noise_level: 0.01
+
+    # AI reliance-specific generation parameters
+    user_types: [novice, intermediate, expert]
+    ai_confidence_levels: [low, medium, high]
+    task_complexity: [simple, moderate, complex]
+    interaction_history: true
+
+  preprocessing:
+    normalize: true
+    normalization_method: standard
+    binarize: false
+    clip_values: true
+    clip_range: [0.0, 1.0]
+    add_noise: false
+
+  features:
+    - perceived_effort_cost
+    - ambiguity_tolerance
+    - reward_delay_sensitivity
+    - automation_expectation
+    - frustration_tolerance
+
+  # Data splits
+  splits:
+    train: 0.7
+    validation: 0.15
+    test: 0.15
+
+# Evaluation configuration
+evaluation:
+  metrics:
+    - reconstruction_error
+    - free_energy
+    - likelihood_ais
+    - sparsity
+    - reliance_patterns
+    - trust_calibration
+
+  ais_config:
+    n_particles: 120
+    n_intermediate: 1200
+    schedule: geometric
+
+  interpretability:
+    enabled: true
+    methods:
+      - weight_saliency
+      - feature_importance
+      - mutual_information
+      - latent_traversal
+      - reliance_pattern_analysis
+
+    # AI reliance-specific analysis
+    ai_analysis:
+      trust_dynamics: true
+      over_reliance_detection: true
+      under_reliance_patterns: true
+      calibration_metrics: true
+      intervention_points: true
+
+# Logging and monitoring
+logging:
+  level: INFO
+  log_interval: 10
+  save_checkpoints: true
+  checkpoint_frequency: 10
+  save_best_only: true
+
+  # TensorBoard logging
+  tensorboard:
+    enabled: true
+    log_dir: runs/ai_reliance
+    log_histograms: true
+    log_images: false
+    log_interaction_patterns: true
+
+  # Weights & Biases
+  wandb:
+    enabled: true
+    project: neurobm-ai-reliance
+    entity: null
+    tags: [ai_reliance, rbm, human_ai_interaction, trust]
+
+# Output configuration
+output:
+  save_dir: results/ai_reliance
+  save_model: true
+  save_data: true
+  save_plots: true
+  generate_report: true
+
+  # AI reliance-specific outputs
+  ai_outputs:
+    trust_patterns: true
+    reliance_profiles: true
+    calibration_analysis: true
+    intervention_strategies: true
+
+# Reproducibility
+random_seed: 42
+deterministic: true
+
+# Hardware configuration
+device: auto
+mixed_precision: false
+num_workers: 4
+
+# Ethical considerations
+ethics:
+  purpose: research_only
+  no_manipulation: true
+  transparent_ai: true
+  user_agency_preservation: true
+  bias_awareness: true
+  privacy_preserving: true

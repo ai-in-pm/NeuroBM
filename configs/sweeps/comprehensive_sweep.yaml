@@ -1,0 +1,238 @@
+# Comprehensive Multi-Parameter Hyperparameter Sweep
+# Advanced exploration of parameter interactions and optimal configurations
+
+name: comprehensive_sweep
+description: "Multi-dimensional hyperparameter optimization with Bayesian search and interaction analysis"
+version: "1.0"
+
+# Base configuration to modify
+base_config: experiments/base.yaml
+
+# Advanced sweep configuration
+method: bayes  # Bayesian optimization for efficiency
+metric:
+  name: val_reconstruction_error
+  goal: minimize
+
+# Bayesian optimization settings
+bayes_config:
+  acquisition_function: expected_improvement
+  n_initial_points: 20
+  n_calls: 200
+  acq_optimizer: auto
+  random_state: 42
+
+# Early termination for efficiency
+early_terminate:
+  type: hyperband
+  max_epochs: 100
+  reduction_factor: 3
+  min_epochs: 10
+
+# Comprehensive parameter space
+parameters:
+  # Model architecture
+  model.architecture.n_hidden:
+    type: int
+    min: 32
+    max: 1024
+    log: true  # Log scale for better exploration
+  
+  model.parameters.sparsity_target:
+    type: float
+    min: 0.01
+    max: 0.3
+  
+  model.parameters.sparsity_weight:
+    type: float
+    min: 0.0001
+    max: 0.01
+    log: true
+  
+  # Training parameters
+  training.learning_rate:
+    type: float
+    min: 0.001
+    max: 0.1
+    log: true
+  
+  training.momentum:
+    type: float
+    min: 0.5
+    max: 0.99
+  
+  training.weight_decay:
+    type: float
+    min: 0.00001
+    max: 0.01
+    log: true
+  
+  training.k_steps:
+    type: int
+    min: 1
+    max: 20
+  
+  training.batch_size:
+    type: categorical
+    values: [16, 32, 64, 128, 256]
+  
+  # Algorithm variants
+  training.algorithm:
+    type: categorical
+    values: [cd, pcd]
+  
+  # Temperature for sampling
+  model.parameters.temperature:
+    type: float
+    min: 0.5
+    max: 2.0
+
+# Resource constraints
+resources:
+  max_trials: 200
+  max_concurrent: 8
+  timeout_minutes: 180
+  gpu_memory_limit: "8GB"
+
+# Multi-objective optimization
+objectives:
+  primary:
+    name: val_reconstruction_error
+    weight: 1.0
+    goal: minimize
+  
+  secondary:
+    name: model_complexity
+    weight: 0.1
+    goal: minimize
+  
+  efficiency:
+    name: training_time
+    weight: 0.05
+    goal: minimize
+
+# Evaluation configuration
+evaluation:
+  # Comprehensive metrics
+  metrics:
+    - val_reconstruction_error
+    - train_reconstruction_error
+    - val_correlation
+    - train_correlation
+    - model_complexity
+    - training_time
+    - convergence_epoch
+    - final_sparsity
+    - gradient_norm
+    - weight_norm
+  
+  # Advanced analysis
+  analysis:
+    parameter_importance: true
+    interaction_effects: true
+    pareto_frontier: true
+    sensitivity_analysis: true
+    convergence_analysis: true
+
+# Output configuration
+output:
+  save_dir: results/sweeps/comprehensive
+  save_all_models: false
+  save_pareto_models: true
+  generate_report: true
+  
+  # Advanced visualizations
+  plots:
+    - parameter_importance
+    - interaction_heatmap
+    - pareto_frontier
+    - convergence_analysis
+    - sensitivity_plots
+    - acquisition_function
+    - optimization_history
+
+# Cross-validation for robust evaluation
+cross_validation:
+  enabled: true
+  folds: 3
+  stratified: false
+  random_state: 42
+
+# Reproducibility
+random_seed: 42
+deterministic: true
+
+# Advanced logging
+logging:
+  level: INFO
+  save_logs: true
+  detailed_metrics: true
+  
+  wandb:
+    enabled: true
+    project: neurobm-comprehensive-sweep
+    tags: [comprehensive, bayesian, multi_objective]
+  
+  tensorboard:
+    enabled: true
+    log_hyperparams: true
+
+# Theoretical framework and analysis goals
+analysis_goals:
+  primary_questions:
+    - "What are the most important hyperparameters for RBM performance?"
+    - "How do parameters interact with each other?"
+    - "What is the Pareto frontier between performance and efficiency?"
+    - "Can we identify robust parameter configurations?"
+  
+  interaction_hypotheses:
+    - "Learning rate and k-steps have strong interaction"
+    - "Hidden units and sparsity parameters interact"
+    - "Batch size affects optimal learning rate"
+    - "Algorithm choice (CD vs PCD) interacts with model size"
+  
+  expected_insights:
+    - "Parameter importance ranking"
+    - "Optimal parameter ranges for different scenarios"
+    - "Trade-offs between performance, complexity, and speed"
+    - "Robust configurations that work across conditions"
+
+# Post-sweep analysis configuration
+post_analysis:
+  # Statistical analysis
+  statistical_tests:
+    - parameter_significance
+    - interaction_effects
+    - robustness_analysis
+  
+  # Model selection
+  model_selection:
+    criteria: [performance, complexity, robustness]
+    ensemble_consideration: true
+  
+  # Recommendations
+  recommendations:
+    generate_guidelines: true
+    scenario_specific: true
+    confidence_intervals: true
+
+# Notes and documentation
+notes: |
+  This comprehensive sweep aims to understand the full hyperparameter landscape
+  of Boltzmann machine training through advanced optimization techniques.
+  
+  Key Features:
+  1. Bayesian optimization for efficient exploration
+  2. Multi-objective optimization considering performance, complexity, and efficiency
+  3. Interaction effect analysis
+  4. Cross-validation for robust evaluation
+  5. Pareto frontier analysis for trade-off understanding
+  
+  The results will inform:
+  - Default parameter recommendations
+  - Parameter tuning guidelines
+  - Understanding of parameter interactions
+  - Robust configuration identification
+  
+  This sweep is computationally intensive but provides comprehensive insights
+  into optimal RBM training configurations.

@@ -1,0 +1,181 @@
+# Autism-Relevant Features Experiment Configuration
+# Modeling autism-related cognitive and behavioral patterns
+
+name: autism_cognitive_modeling
+description: "Autism-relevant cognitive and behavioral feature modeling with specialized RBM configuration"
+version: "1.0"
+
+# Model configuration
+model:
+  type: rbm
+  architecture:
+    n_visible: auto  # Determined by feature count (5 features)
+    n_hidden: 256   # Balanced hidden layer size
+    visible_type: bernoulli
+    hidden_type: bernoulli
+  parameters:
+    learning_rate: 0.008
+    momentum: 0.9
+    weight_decay: 0.0002
+    temperature: 1.0
+    use_bias: true
+    sparsity_target: 0.08  # Moderate sparsity for autism patterns
+    sparsity_weight: 0.001
+
+# Training configuration
+training:
+  algorithm: cd
+  k_steps: 3      # Moderate CD steps for stable learning
+  persistent: false
+  batch_size: 48  # Medium batch size
+  epochs: 120
+  validation_split: 0.2
+
+  # Optimization
+  optimizer:
+    type: adamw
+    learning_rate: 0.008
+    beta1: 0.9
+    beta2: 0.999
+    weight_decay: 0.0002
+
+  # Learning rate scheduling
+  lr_scheduler:
+    type: plateau
+    factor: 0.7
+    patience: 10
+    threshold: 0.001
+    min_lr: 0.0001
+
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 20
+    monitor: val_loss
+    min_delta: 0.0008
+    restore_best_weights: true
+
+# Data configuration
+data:
+  regime: autism
+  generation:
+    method: skewed
+    n_samples: 12000
+    random_seed: 42
+    noise_level: 0.008
+
+    # Autism-specific generation parameters
+    sensory_profiles: [hyper, hypo, mixed]
+    support_needs: [level1, level2, level3]
+    masking_patterns: true
+    developmental_variability: 0.25
+
+  preprocessing:
+    normalize: true
+    normalization_method: minmax
+    binarize: false
+    clip_values: true
+    clip_range: [0.0, 1.0]
+    add_noise: false
+
+  features:
+    - sensory_sensitivity
+    - routine_adherence
+    - focused_interest_intensity
+    - social_inference_difficulty
+    - attention_switch_latency
+
+  # Data splits
+  splits:
+    train: 0.7
+    validation: 0.15
+    test: 0.15
+
+# Evaluation configuration
+evaluation:
+  metrics:
+    - reconstruction_error
+    - free_energy
+    - likelihood_ais
+    - sparsity
+    - pattern_consistency
+    - sensory_profile_clustering
+
+  ais_config:
+    n_particles: 150
+    n_intermediate: 1500
+    schedule: geometric
+
+  interpretability:
+    enabled: true
+    methods:
+      - weight_saliency
+      - feature_importance
+      - mutual_information
+      - latent_traversal
+      - sensory_pattern_analysis
+
+    # Autism-specific analysis
+    autism_analysis:
+      sensory_profiles: true
+      routine_patterns: true
+      interest_clustering: true
+      social_cognitive_mapping: true
+      attention_flexibility: true
+
+# Logging and monitoring
+logging:
+  level: INFO
+  log_interval: 8
+  save_checkpoints: true
+  checkpoint_frequency: 10
+  save_best_only: true
+
+  # TensorBoard logging
+  tensorboard:
+    enabled: true
+    log_dir: runs/autism
+    log_histograms: true
+    log_images: true
+    log_sensory_patterns: true
+
+  # Weights & Biases
+  wandb:
+    enabled: true
+    project: neurobm-autism
+    entity: null
+    tags: [autism, rbm, cognitive, neurodiversity]
+
+# Output configuration
+output:
+  save_dir: results/autism
+  save_model: true
+  save_data: true
+  save_plots: true
+  generate_report: true
+
+  # Autism-specific outputs
+  autism_outputs:
+    sensory_profiles: true
+    routine_analysis: true
+    interest_patterns: true
+    support_recommendations: true
+
+# Reproducibility
+random_seed: 42
+deterministic: true
+
+# Hardware configuration
+device: auto
+mixed_precision: false
+num_workers: 4
+
+# Ethical considerations
+ethics:
+  purpose: research_only
+  neurodiversity_affirming: true
+  no_diagnosis: true
+  no_treatment_advice: true
+  synthetic_data_only: true
+  privacy_preserving: true
+  respectful_language: true

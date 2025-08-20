@@ -1,0 +1,107 @@
+# Hidden Units Hyperparameter Sweep Configuration
+# Systematic exploration of hidden layer sizes for RBM models
+
+name: hidden_units_sweep
+description: "Comprehensive sweep over hidden unit counts to find optimal model capacity"
+version: "1.0"
+
+# Base configuration to modify
+base_config: experiments/base.yaml
+
+# Sweep method and configuration
+method: grid  # Options: grid, random, bayes
+metric:
+  name: val_reconstruction_error
+  goal: minimize
+
+# Early termination criteria
+early_terminate:
+  type: median
+  min_trials: 5
+  evaluation_interval: 10
+
+# Parameters to sweep
+parameters:
+  # Primary parameter: hidden units
+  model.architecture.n_hidden:
+    values: [32, 64, 96, 128, 192, 256, 384, 512, 768, 1024]
+
+  # Secondary parameters to explore interactions
+  training.learning_rate:
+    values: [0.005, 0.01, 0.02]
+
+  training.k_steps:
+    values: [1, 3, 5]
+
+  # Model parameters that might interact with capacity
+  model.parameters.sparsity_target:
+    values: [0.05, 0.1, 0.15]
+
+# Resource constraints
+resources:
+  max_trials: 90  # 10 * 3 * 3 * 3 = 270 max, but early termination
+  max_concurrent: 4
+  timeout_minutes: 120
+
+# Evaluation configuration
+evaluation:
+  # Metrics to track
+  metrics:
+    - val_reconstruction_error
+    - train_reconstruction_error
+    - model_complexity
+    - training_time
+    - convergence_epoch
+
+  # Additional analysis
+  analysis:
+    capacity_analysis: true
+    overfitting_detection: true
+    efficiency_metrics: true
+
+# Output configuration
+output:
+  save_dir: results/sweeps/hidden_units
+  save_all_models: false
+  save_best_only: true
+  generate_report: true
+
+  # Visualization
+  plots:
+    - parameter_importance
+    - performance_vs_capacity
+    - training_curves
+    - resource_usage
+
+# Reproducibility
+random_seed: 42
+deterministic: true
+
+# Logging
+logging:
+  level: INFO
+  save_logs: true
+  wandb:
+    enabled: true
+    project: neurobm-sweeps
+    tags: [hidden_units, capacity, grid_search]
+
+# Notes and hypotheses
+notes: |
+  This sweep explores the relationship between model capacity (hidden units) and performance.
+
+  Hypotheses:
+  1. Larger models will have better reconstruction but may overfit
+  2. Optimal size depends on data complexity and regularization
+  3. Very large models may be harder to train (vanishing gradients)
+  4. Interaction effects with learning rate and CD steps
+
+  Expected outcomes:
+  - Performance plateau after certain size
+  - Training time increases linearly with size
+  - Memory usage increases quadratically
+
+  Analysis focus:
+  - Find optimal capacity for different scenarios
+  - Identify overfitting threshold
+  - Understand computational trade-offs

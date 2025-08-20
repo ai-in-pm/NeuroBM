@@ -1,0 +1,143 @@
+# Base Cognitive Features Experiment Configuration
+# General population cognitive modeling with standard RBM
+
+name: base_cognitive_features
+description: "Baseline experiment for general population cognitive features using RBM"
+version: "1.0"
+
+# Model configuration
+model:
+  type: rbm
+  architecture:
+    n_visible: auto  # Determined by feature count
+    n_hidden: 256
+    visible_type: bernoulli
+    hidden_type: bernoulli
+  parameters:
+    learning_rate: 0.01
+    momentum: 0.9
+    weight_decay: 0.0001
+    temperature: 1.0
+    use_bias: true
+    sparsity_target: 0.1
+    sparsity_weight: 0.001
+
+# Training configuration
+training:
+  algorithm: cd  # Contrastive Divergence
+  k_steps: 1
+  persistent: false
+  batch_size: 64
+  epochs: 100
+  validation_split: 0.2
+
+  # Optimization
+  optimizer:
+    type: sgd
+    learning_rate: 0.01
+    momentum: 0.9
+    weight_decay: 0.0001
+
+  # Learning rate scheduling
+  lr_scheduler:
+    type: step
+    step_size: 30
+    gamma: 0.5
+
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 15
+    monitor: val_loss
+    min_delta: 0.001
+    restore_best_weights: true
+
+# Data configuration
+data:
+  regime: base
+  generation:
+    method: skewed
+    n_samples: 10000
+    random_seed: 42
+    noise_level: 0.01
+
+  preprocessing:
+    normalize: true
+    normalization_method: minmax
+    binarize: false
+    clip_values: true
+    clip_range: [0.0, 1.0]
+    add_noise: false
+
+  features:
+    - attention_span
+    - working_memory_proxy
+    - novelty_seeking
+    - sleep_quality
+    - stress_index
+
+  # Data splits
+  splits:
+    train: 0.7
+    validation: 0.15
+    test: 0.15
+
+# Evaluation configuration
+evaluation:
+  metrics:
+    - reconstruction_error
+    - free_energy
+    - likelihood_ais
+    - sparsity
+
+  ais_config:
+    n_particles: 100
+    n_intermediate: 1000
+    schedule: geometric
+
+  interpretability:
+    enabled: true
+    methods:
+      - weight_saliency
+      - feature_importance
+      - mutual_information
+      - latent_traversal
+
+# Logging and monitoring
+logging:
+  level: INFO
+  log_interval: 10
+  save_checkpoints: true
+  checkpoint_frequency: 10
+  save_best_only: true
+
+  # TensorBoard logging
+  tensorboard:
+    enabled: true
+    log_dir: runs/base
+    log_histograms: true
+    log_images: false
+
+  # Weights & Biases
+  wandb:
+    enabled: false
+    project: neurobm
+    entity: null
+    tags: [base, rbm, cognitive]
+
+# Output configuration
+output:
+  save_dir: results/base
+  save_model: true
+  save_data: true
+  save_plots: true
+  generate_report: true
+
+# Reproducibility
+random_seed: 42
+deterministic: true
+
+# Hardware configuration
+device: auto  # auto, cpu, cuda
+mixed_precision: false
+num_workers: 4

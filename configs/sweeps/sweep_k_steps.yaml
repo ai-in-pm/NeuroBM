@@ -1,0 +1,119 @@
+# Contrastive Divergence K-Steps Hyperparameter Sweep
+# Exploration of CD-k training dynamics and convergence properties
+
+name: k_steps_sweep
+description: "Systematic analysis of contrastive divergence k-step parameter effects on training quality and efficiency"
+version: "1.0"
+
+# Base configuration to modify
+base_config: experiments/base.yaml
+
+# Sweep method and configuration
+method: grid
+metric:
+  name: val_reconstruction_error
+  goal: minimize
+
+# Early termination for efficiency
+early_terminate:
+  type: performance_plateau
+  patience: 15
+  min_improvement: 0.001
+
+# Parameters to sweep
+parameters:
+  # Primary parameter: CD k-steps
+  training.k_steps:
+    values: [1, 2, 3, 5, 7, 10, 15, 20, 25]
+
+  # Training algorithm variants
+  training.algorithm:
+    values: [cd, pcd]  # Compare CD vs PCD
+
+  # Learning rate interaction
+  training.learning_rate:
+    values: [0.005, 0.01, 0.02, 0.05]
+
+  # Model size interaction
+  model.architecture.n_hidden:
+    values: [128, 256, 512]
+
+# Resource constraints
+resources:
+  max_trials: 108  # 9 * 2 * 4 * 3 = 216 max combinations
+  max_concurrent: 6
+  timeout_minutes: 90
+
+# Evaluation configuration
+evaluation:
+  # Primary metrics
+  metrics:
+    - val_reconstruction_error
+    - train_reconstruction_error
+    - convergence_speed
+    - training_stability
+    - computational_cost
+
+  # CD-specific analysis
+  cd_analysis:
+    mixing_time_estimation: true
+    chain_diagnostics: true
+    gradient_variance: true
+    effective_sample_size: true
+
+# Output configuration
+output:
+  save_dir: results/sweeps/k_steps
+  save_all_models: false
+  save_best_only: true
+  generate_report: true
+
+  # Specialized visualizations
+  plots:
+    - k_vs_performance
+    - convergence_curves
+    - mixing_analysis
+    - computational_efficiency
+    - algorithm_comparison
+
+# Reproducibility
+random_seed: 42
+deterministic: true
+
+# Logging
+logging:
+  level: INFO
+  save_logs: true
+  wandb:
+    enabled: true
+    project: neurobm-sweeps
+    tags: [k_steps, contrastive_divergence, training_dynamics]
+
+# Theoretical background and hypotheses
+notes: |
+  This sweep investigates the fundamental trade-off in contrastive divergence training
+  between computational cost and sample quality.
+
+  Theoretical Background:
+  - CD-1 is fast but biased (doesn't reach equilibrium)
+  - Higher k reduces bias but increases computational cost
+  - PCD maintains persistent chains for better mixing
+
+  Hypotheses:
+  1. Performance improves with k but with diminishing returns
+  2. Optimal k depends on model complexity and data
+  3. PCD should outperform CD for same k values
+  4. Very high k may not improve performance significantly
+  5. Learning rate and k interact (higher k may need lower LR)
+
+  Key Questions:
+  - What is the optimal k for different model sizes?
+  - When does PCD become worth the extra complexity?
+  - How does k affect training stability?
+  - What is the computational efficiency frontier?
+
+  Expected Findings:
+  - Sweet spot around k=3-10 for most cases
+  - PCD advantage increases with model complexity
+  - Computational cost grows linearly with k
+  - Stability improves with moderate k values

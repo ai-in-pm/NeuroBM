@@ -1,0 +1,176 @@
+# PTSD-Relevant Features Experiment Configuration
+# Modeling PTSD symptom patterns and cognitive dynamics
+
+name: ptsd_symptom_modeling
+description: "PTSD-relevant cognitive and behavioral feature modeling using RBM with enhanced training"
+version: "1.0"
+
+# Model configuration
+model:
+  type: rbm
+  architecture:
+    n_visible: auto  # Determined by feature count (6 features)
+    n_hidden: 512   # Larger hidden layer for complex PTSD patterns
+    visible_type: bernoulli
+    hidden_type: bernoulli
+  parameters:
+    learning_rate: 0.005  # Lower LR for stability with complex patterns
+    momentum: 0.95
+    weight_decay: 0.0005
+    temperature: 1.0
+    use_bias: true
+    sparsity_target: 0.05  # Lower sparsity for richer representations
+    sparsity_weight: 0.002
+
+# Training configuration
+training:
+  algorithm: pcd  # Persistent Contrastive Divergence for better sampling
+  k_steps: 10     # More steps for complex patterns
+  persistent: true
+  batch_size: 32  # Smaller batches for better gradient estimates
+  epochs: 150     # More epochs for complex learning
+  validation_split: 0.2
+
+  # Optimization
+  optimizer:
+    type: adam
+    learning_rate: 0.005
+    beta1: 0.9
+    beta2: 0.999
+    weight_decay: 0.0005
+
+  # Learning rate scheduling
+  lr_scheduler:
+    type: cosine_annealing
+    T_max: 150
+    eta_min: 0.0001
+
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 25
+    monitor: val_reconstruction_error
+    min_delta: 0.0005
+    restore_best_weights: true
+
+# Data configuration
+data:
+  regime: ptsd
+  generation:
+    method: skewed
+    n_samples: 15000  # More samples for complex patterns
+    random_seed: 42
+    noise_level: 0.005  # Less noise for cleaner patterns
+
+    # PTSD-specific generation parameters
+    severity_levels: [mild, moderate, severe]
+    comorbidity_rate: 0.3
+    temporal_variability: 0.2
+
+  preprocessing:
+    normalize: true
+    normalization_method: robust  # Robust to outliers
+    binarize: false
+    clip_values: true
+    clip_range: [0.0, 1.0]
+    add_noise: false
+
+  features:
+    - hyperarousal_proxy
+    - startle_sensitivity
+    - avoidance_tendency
+    - intrusive_thought_proxy
+    - sleep_disruption
+    - threat_bias_proxy
+
+  # Data splits
+  splits:
+    train: 0.7
+    validation: 0.15
+    test: 0.15
+
+# Evaluation configuration
+evaluation:
+  metrics:
+    - reconstruction_error
+    - free_energy
+    - likelihood_ais
+    - sparsity
+    - symptom_clustering
+    - severity_prediction
+
+  ais_config:
+    n_particles: 200  # More particles for better estimates
+    n_intermediate: 2000
+    schedule: geometric
+
+  interpretability:
+    enabled: true
+    methods:
+      - weight_saliency
+      - feature_importance
+      - mutual_information
+      - latent_traversal
+      - symptom_interaction_analysis
+
+    # PTSD-specific analysis
+    ptsd_analysis:
+      symptom_correlation: true
+      severity_mapping: true
+      trigger_sensitivity: true
+      recovery_patterns: true
+
+# Logging and monitoring
+logging:
+  level: INFO
+  log_interval: 5
+  save_checkpoints: true
+  checkpoint_frequency: 10
+  save_best_only: true
+
+  # TensorBoard logging
+  tensorboard:
+    enabled: true
+    log_dir: runs/ptsd
+    log_histograms: true
+    log_images: true
+    log_symptom_patterns: true
+
+  # Weights & Biases
+  wandb:
+    enabled: true
+    project: neurobm-ptsd
+    entity: null
+    tags: [ptsd, rbm, symptoms, mental_health]
+
+# Output configuration
+output:
+  save_dir: results/ptsd
+  save_model: true
+  save_data: true
+  save_plots: true
+  generate_report: true
+
+  # PTSD-specific outputs
+  ptsd_outputs:
+    symptom_maps: true
+    severity_analysis: true
+    intervention_targets: true
+    risk_factors: true
+
+# Reproducibility
+random_seed: 42
+deterministic: true
+
+# Hardware configuration
+device: auto
+mixed_precision: true  # Enable for faster training
+num_workers: 4
+
+# Ethical considerations
+ethics:
+  purpose: research_only
+  no_diagnosis: true
+  no_treatment_advice: true
+  synthetic_data_only: true
+  privacy_preserving: true

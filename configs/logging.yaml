@@ -1,0 +1,238 @@
+# Comprehensive Logging Configuration for NeuroBM
+# This configuration supports multiple logging scenarios and environments
+
+version: 1
+disable_existing_loggers: false
+
+# Formatters define the format of log messages
+formatters:
+  # Simple format for console output
+  simple:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+
+  # Detailed format for file output
+  detailed:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(module)s:%(funcName)s:%(lineno)d - %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+
+  # JSON format for structured logging
+  json:
+    format: '{"timestamp": "%(asctime)s", "logger": "%(name)s", "level": "%(levelname)s", "module": "%(module)s", "function": "%(funcName)s", "line": %(lineno)d, "message": "%(message)s"}'
+    datefmt: '%Y-%m-%dT%H:%M:%S'
+
+  # Training-specific format
+  training:
+    format: '[%(asctime)s] TRAIN - %(levelname)s - %(message)s'
+    datefmt: '%H:%M:%S'
+
+  # Experiment format with run ID
+  experiment:
+    format: '[%(asctime)s] EXP - %(levelname)s - %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+
+# Handlers define where log messages go
+handlers:
+  # Console handler for interactive use
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: simple
+    stream: ext://sys.stdout
+
+  # Console handler for errors only
+  console_error:
+    class: logging.StreamHandler
+    level: ERROR
+    formatter: detailed
+    stream: ext://sys.stderr
+
+  # General application log file
+  file_general:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: detailed
+    filename: logs/neurobm.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+    encoding: utf8
+
+  # Training-specific log file
+  file_training:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: training
+    filename: logs/training.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 10
+    encoding: utf8
+
+  # Experiment log file with timestamp
+  file_experiment:
+    class: logging.handlers.TimedRotatingFileHandler
+    level: INFO
+    formatter: experiment
+    filename: logs/experiments.log
+    when: midnight
+    interval: 1
+    backupCount: 30
+    encoding: utf8
+
+  # Error-only log file
+  file_error:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: detailed
+    filename: logs/errors.log
+    maxBytes: 5242880  # 5MB
+    backupCount: 5
+    encoding: utf8
+
+  # JSON structured log file for analysis
+  file_json:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: json
+    filename: logs/structured.jsonl
+    maxBytes: 20971520  # 20MB
+    backupCount: 3
+    encoding: utf8
+
+# Loggers define logging behavior for different parts of the application
+loggers:
+  # Root neurobm logger
+  neurobm:
+    level: DEBUG
+    handlers: [console, file_general, file_error]
+    propagate: false
+
+  # Model-specific logging
+  neurobm.models:
+    level: DEBUG
+    handlers: [console, file_general]
+    propagate: false
+
+  neurobm.models.rbm:
+    level: INFO
+    handlers: [file_general]
+    propagate: true
+
+  neurobm.models.dbm:
+    level: INFO
+    handlers: [file_general]
+    propagate: true
+
+  neurobm.models.crbm:
+    level: INFO
+    handlers: [file_general]
+    propagate: true
+
+  # Training-specific logging
+  neurobm.training:
+    level: DEBUG
+    handlers: [console, file_training, file_json]
+    propagate: false
+
+  neurobm.training.loop:
+    level: INFO
+    handlers: [file_training]
+    propagate: true
+
+  neurobm.training.callbacks:
+    level: INFO
+    handlers: [file_training]
+    propagate: true
+
+  # Data handling logging
+  neurobm.data:
+    level: INFO
+    handlers: [console, file_general]
+    propagate: false
+
+  # Interpretability logging
+  neurobm.interpret:
+    level: INFO
+    handlers: [console, file_general]
+    propagate: false
+
+  # Experiment logging
+  experiments:
+    level: INFO
+    handlers: [console, file_experiment, file_json]
+    propagate: false
+
+  # Dashboard logging
+  dashboards:
+    level: INFO
+    handlers: [console, file_general]
+    propagate: false
+
+  # External library logging
+  matplotlib:
+    level: WARNING
+    handlers: [file_general]
+    propagate: false
+
+  PIL:
+    level: WARNING
+    handlers: [file_general]
+    propagate: false
+
+  urllib3:
+    level: WARNING
+    handlers: [file_general]
+    propagate: false
+
+  requests:
+    level: WARNING
+    handlers: [file_general]
+    propagate: false
+
+# Root logger configuration
+root:
+  level: INFO
+  handlers: [console, file_general, file_error]
+
+# Environment-specific configurations
+environments:
+  development:
+    level: DEBUG
+    console_level: DEBUG
+    file_level: DEBUG
+    enable_json: true
+
+  production:
+    level: INFO
+    console_level: WARNING
+    file_level: INFO
+    enable_json: true
+
+  testing:
+    level: WARNING
+    console_level: ERROR
+    file_level: DEBUG
+    enable_json: false
+
+# Special configurations for different use cases
+profiles:
+  # Minimal logging for quick experiments
+  minimal:
+    handlers: [console]
+    level: WARNING
+
+  # Verbose logging for debugging
+  verbose:
+    handlers: [console, file_general, file_training, file_json]
+    level: DEBUG
+    console_level: DEBUG
+
+  # Silent mode for batch processing
+  silent:
+    handlers: [file_general, file_error]
+    level: INFO
+
+  # Training-focused logging
+  training_focus:
+    handlers: [console, file_training, file_json]
+    level: INFO
+    console_level: INFO

@@ -1,0 +1,28 @@
+name: temp_schedules
+model:
+  type: rbm
+  hidden_units: 256
+  visible_units: auto
+  activation: sigmoid
+training:
+  algorithm: cd
+  k_steps: 1
+  learning_rate: 0.01
+  batch_size: 64
+  epochs: 100
+  early_stopping: true
+  patience: 10
+data:
+  regime: temp_schedules
+  normalize: true
+  binarize: false
+  features:
+  - attention_span
+  - working_memory_proxy
+  - novelty_seeking
+  - sleep_quality
+  - stress_index
+logging:
+  log_interval: 10
+  save_checkpoints: true
+  tensorboard: true
