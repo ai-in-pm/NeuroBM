@@ -8,7 +8,7 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-**Owner**: Darrell Mesa (darrell.mesa@pm-ss.org)
+**Owner**: Darrell Mesa (dmesa@ai-in-pm.com)
 
 **GitHub**: https://github.com/ai-in-pm
 
